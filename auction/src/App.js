@@ -1,12 +1,11 @@
 import React from 'react';
 import './App.css';
+import Auction from './auction'; 
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        
-      </header>
+      <Auction />
     </div>
   );
 }
