@@ -13,12 +13,33 @@ const Uploader = observer(class Uploader extends Component {
     }
 
     // decorated action which collects and stores the config upload
-    onUpload(event) {
-        console.log(event.target.files[0]);
+    async onUpload(event) {
+      if (event && event.target && event.target.files) {
+        const fileData = await this.readFileContent(event.target.files[0]);
+        console.log(fileData)
+      }
     }
+
+    // method example taken and modified from https://blog.shovonhasan.com/using-promises-with-filereader/
+    readFileContent(file) {
+      const reader = new FileReader();
+
+      return new Promise((resolve, reject) => {
+        reader.onerror = () => {
+          reader.abort();
+          reject(new DOMException("bad input file."));
+        };
+
+        reader.onload = () => {
+          resolve(reader.result);
+        };
+
+        reader.readAsText(file);
+      });
+    };
 });
 
 decorate(Uploader, {
-  onUpload: action
+  onUpload: action.bound
 });
 export default Uploader;
