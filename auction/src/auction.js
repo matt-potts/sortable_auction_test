@@ -3,6 +3,10 @@ import Uploader from "./uploader";
 import { observer } from "mobx-react"
 import { action, computed, decorate, observable } from "mobx"
 
+// This component runs an auction. It takes a config and auction data, uploaded by the user, and returns
+// winners from the auction in a json format.
+// Still to do: adjustment factoring, validations
+// nice to haves for later: flashier UI, Node API support
 const Auction = observer(class Auction extends Component {
   configJson;
   auctionJson;
