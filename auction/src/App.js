@@ -1,6 +1,7 @@
 import React from 'react';
+import 'bootstrap/dist/css/bootstrap.css';
 import './App.css';
-import Auction from './auction'; 
+import Auction from './auction';
 
 function App() {
   return (
