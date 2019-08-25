@@ -10,9 +10,9 @@ const Uploader = observer(class Uploader extends Component {
   }
 
   render() {
-    return <div class="custom-file">
-      <input class="custom-file-input pointer" type="file" name="configLoader" onChange={this.onUpload} />
-      <label class="custom-file-label" for="customFile">Choose file</label>
+    return <div className="custom-file">
+      <input className="custom-file-input pointer" type="file" id="configLoader" name="configLoader" onChange={this.onUpload} />
+      <label className="custom-file-label" htmlFor="configLoader">Choose file</label>
     </div>;
   }
 

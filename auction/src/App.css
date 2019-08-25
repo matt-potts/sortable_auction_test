@@ -1,3 +1,49 @@
+body {
+    background-color: #FFFFFF;
+}
+
+html,
+body,
+#root,
+.App {
+    height: 100%;
+}
+
 .pointer {
     cursor: pointer;
+}
+
+.w-30 {
+    width: 30rem;
+}
+
+.uploader {
+    align-items: center;
+    background-color: rgb(241, 241, 244);
+    border: 1px solid rgb(150, 150, 150);
+    border-radius: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 1rem;
+    padding: 3rem;
+}
+.winner {
+    background-color: #FFFFFF;
+    border: 1px solid rgb(150, 150, 150);
+    border-radius: 2rem;
+    margin-bottom: 1rem;
+    padding: 2rem;
+}
+
+.winner p {
+    margin-bottom: 0.3rem;
+}
+
+.carousel.slide {
+  max-width: 16rem;
+}
+
+.carousel-indicators li {
+  background-color: darkgray;
 }
