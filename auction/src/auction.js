@@ -18,6 +18,7 @@ const Auction = observer(class Auction extends Component {
   showDataUploader = false;
   showAuctionStartButton = false;
   showRestartButton = false;
+  activeError;
 
   get siteList() {
     let sites;
@@ -47,6 +48,12 @@ const Auction = observer(class Auction extends Component {
             <h4>The world's 57th least mediocre auction checker</h4>
           </div>
           <div className="uploader">
+            {
+              this.activeError && <div>
+                <p className="red">{this.activeError}</p>
+              </div>
+            }
+
             {
               this.showConfigUploader && <>
                 <p>Upload your config file</p>
@@ -137,6 +144,7 @@ const Auction = observer(class Auction extends Component {
     }
 
     restart() {
+      this.activeError = null;
       this.showDataUploader = false;
       this.showAuctionStartButton = false;
       this.showRestartButton = false;
@@ -151,7 +159,8 @@ const Auction = observer(class Auction extends Component {
       const allAuctions = this.auctionJson.slice();
 
       if (!allAuctions) {
-        // bad json file. No auctions.
+        this.showError('There are no available auctions in your data file.');
+        return;
       }
 
       // convert json object to array, then iterate
@@ -164,11 +173,19 @@ const Auction = observer(class Auction extends Component {
 
         // check auction for errors
         if (!currentBids.length) {
-          // no bids provided for thie auction
+          this.showError('There were no bids provided for thie auction.');
+          return;
         } else if (!currentUnits.length) {
-          // there are no listed units to bid on
+          this.showError('There are no listed units to bid on');
+          return;
         } else if (!site) {
-          // no site listed
+          this.showError('There is no site listed for the current auction.');
+          return;
+        }
+
+        if (!this.siteList && !this.bidderList) {
+          this.showError('The provided config file is corrputed.');
+          return;
         }
 
         // if we have a result, the site is approved to entertain bids
@@ -220,13 +237,16 @@ const Auction = observer(class Auction extends Component {
                     };
                   }
                 } else {
-                  // bid was under the floor
+                  this.showError(`The current bid of ${adjustedBid} from ${bidder} was under the floor.`);
+                  return;
                 }
               } else {
-                // this unit is not approved to bid on
+                this.showError(`The current unit, ${unit}, is not approved to bid on.`);
+                return;
               }
             } else {
-              // bidder not approved
+              this.showError(`The current bidder, ${bidder}, is not approved.`);
+              return;
             }
           });
 
@@ -241,7 +261,8 @@ const Auction = observer(class Auction extends Component {
             });
           }
         } else {
-          // site not approved
+          this.showError(`${site} is not an approved site.`);
+          return;
         }
 
         return finalWinners;
@@ -256,6 +277,12 @@ const Auction = observer(class Auction extends Component {
       this.showAuctionStartButton = false;
       this.showRestartButton = true;
     }
+
+    showError(error) {
+      this.showAuctionStartButton = false;
+      this.showRestartButton = true;
+      this.activeError = error;
+    }
 });
 
 decorate(Auction, {
@@ -263,6 +290,7 @@ decorate(Auction, {
   runAuction: action.bound,
   saveConfigContent: action.bound,
   saveAuctionContent: action.bound,
+  showError: action.bound,
   bidderList: computed,
   siteList: computed,
   auctionJson: observable,

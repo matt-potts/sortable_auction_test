@@ -47,3 +47,7 @@ body,
 .carousel-indicators li {
   background-color: darkgray;
 }
+
+.red {
+  color: #FF0000;
+}
