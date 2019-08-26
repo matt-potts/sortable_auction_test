@@ -17,7 +17,7 @@ const AuctionCarousel = observer(class AuctionCarousel extends Component {
 
     render() {
       return <>
-        <Carousel>
+        <Carousel indicators={false}>
           {
             this.props.items.map((item, index) => {
               return <Carousel.Item key={index}>
