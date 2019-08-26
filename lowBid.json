@@ -6,7 +6,7 @@
             {
                 "bidder": "AUCT",
                 "unit": "banner",
-                "bid": 35
+                "bid": 10
             },
             {
                 "bidder": "BIDD",

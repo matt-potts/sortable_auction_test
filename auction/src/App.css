@@ -26,6 +26,7 @@ body,
     flex-direction: column;
     justify-content: center;
     margin: 0 1rem;
+    max-width: 20rem;
     padding: 3rem;
 }
 .winner {
@@ -46,6 +47,30 @@ body,
 
 .carousel-indicators li {
   background-color: darkgray;
+}
+
+.carousel-control-prev {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 2rem;
+  height: 1.5rem;
+  margin-left: 0.3rem;
+  top: calc(50% - 1rem);
+  width: 1.5rem;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  height: 0.8rem;
+  width: 0.8rem;
+}
+
+.carousel-control-next {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 2rem;
+  height: 1.5rem;
+  margin-right: 0.3rem;
+  top: calc(50% - 1rem);
+  width: 1.5rem;
 }
 
 .red {

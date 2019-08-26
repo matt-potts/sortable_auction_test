@@ -156,124 +156,125 @@ const Auction = observer(class Auction extends Component {
     // formats everything into a json format.
     runAuction() {
       let results = [];
-      const allAuctions = this.auctionJson.slice();
+      let allAuctions;
 
-      if (!allAuctions) {
+      try {
+        allAuctions = this.auctionJson.slice()
+      } catch (e) {
         this.showError('There are no available auctions in your data file.');
+        this.showAuctionStartButton = false;
+        this.showRestartButton = true;
         return;
       }
 
-      // convert json object to array, then iterate
-      results = allAuctions.map((auction) => {
-        const currentBids = auction.bids.slice();
-        const site = auction.site;
-        const currentUnits = auction.units.slice();
-        const winningUnitBids = {};
-        const finalWinners = [];
+      try {
+        // convert json object to array, then iterate
+        results = allAuctions.map((auction) => {
+          const currentBids = auction.bids.slice();
+          const site = auction.site;
+          const currentUnits = auction.units.slice();
+          const winningUnitBids = {};
+          const finalWinners = [];
 
-        // check auction for errors
-        if (!currentBids.length) {
-          this.showError('There were no bids provided for thie auction.');
-          return;
-        } else if (!currentUnits.length) {
-          this.showError('There are no listed units to bid on');
-          return;
-        } else if (!site) {
-          this.showError('There is no site listed for the current auction.');
-          return;
-        }
+          // check auction for errors
+          if (!currentBids.length) {
+            throw new Error('There were no bids provided for the auction.');
+          } else if (!currentUnits.length) {
+            throw new Error('There are no listed units to bid on');
+          } else if (!site) {
+            throw new Error('There is no site listed for the current auction.');
+          }
 
-        if (!this.siteList && !this.bidderList) {
-          this.showError('The provided config file is corrputed.');
-          return;
-        }
+          if (!this.siteList && !this.bidderList) {
+            throw new Error('The provided config file is corrputed.');
+          }
 
-        // if we have a result, the site is approved to entertain bids
-        const approvedSite = this.siteList.find((currentSite) => {
-          return currentSite.name === site;
-        });
+          // if we have a result, the site is approved to entertain bids
+          const approvedSite = this.siteList.find((currentSite) => {
+            return currentSite.name === site;
+          });
 
-        if (!!approvedSite) {
-          const minBidAmount = approvedSite.floor;
+          if (!!approvedSite) {
+            const minBidAmount = approvedSite.floor;
 
-          currentBids.forEach((currentBid) => {
-            // a bid looks something like this:
-            // {
-            //   "bidder": "AUCT",
-            //   "unit": "sidebar",
-            //   "bid": 55
-            // }
-            const { bid, bidder, unit } = currentBid;
+            currentBids.forEach((currentBid) => {
+              // a bid looks something like this:
+              // {
+              //   "bidder": "AUCT",
+              //   "unit": "sidebar",
+              //   "bid": 55
+              // }
+              const { bid, bidder, unit } = currentBid;
 
-            // if the bidder is found, they're approved to bid
-            const approvedBidder = this.bidderList.find((currentBidder) => {
-              return currentBidder.name === bidder;
-            });
+              // if the bidder is found, they're approved to bid
+              const approvedBidder = this.bidderList.find((currentBidder) => {
+                return currentBidder.name === bidder;
+              });
 
-            if (!!approvedBidder) {
-              // unit is available to bid on
-              if (currentUnits.includes(unit)) {
-                const winningUnitBid = winningUnitBids[unit];
+              if (!!approvedBidder) {
+                // unit is available to bid on
+                if (currentUnits.includes(unit)) {
+                  const winningUnitBid = winningUnitBids[unit];
 
-                // make the adjustment
-                const adjustedBid = bid + approvedBidder.adjustment;
+                  // make the adjustment
+                  const adjustedBid = bid + approvedBidder.adjustment;
 
-                // they've met the floor requirements
-                if (adjustedBid > minBidAmount) {
-                  // an existing bid for this unit
-                  if (!!winningUnitBid) {
-                    // this is a new winning bid. Overwrite info. Otherwise, do nothing.
-                    if (adjustedBid > winningUnitBid.bidAmount) {
+                  // they've met the floor requirements
+                  if (adjustedBid > minBidAmount) {
+                    // an existing bid for this unit
+                    if (!!winningUnitBid) {
+                      // this is a new winning bid. Overwrite info. Otherwise, do nothing.
+                      if (adjustedBid > winningUnitBid.bidAmount) {
+                        winningUnitBids[unit] = {
+                          bidder: bidder,
+                          bidAmount: adjustedBid
+                        };
+                      }
+                    } else {
+                      // save first bid
                       winningUnitBids[unit] = {
                         bidder: bidder,
                         bidAmount: adjustedBid
                       };
                     }
                   } else {
-                    // save first bid
-                    winningUnitBids[unit] = {
-                      bidder: bidder,
-                      bidAmount: adjustedBid
-                    };
+                    throw new Error(`The current bid of ${adjustedBid.toFixed(2)} from ${bidder} was under the floor.`);
                   }
                 } else {
-                  this.showError(`The current bid of ${adjustedBid} from ${bidder} was under the floor.`);
-                  return;
+                  throw new Error(`The current unit, ${unit}, is not approved to bid on.`);
                 }
               } else {
-                this.showError(`The current unit, ${unit}, is not approved to bid on.`);
-                return;
+                throw new Error(`The current bidder, ${bidder}, is not approved.`);
               }
-            } else {
-              this.showError(`The current bidder, ${bidder}, is not approved.`);
-              return;
-            }
-          });
-
-          // construct the desired output from the winning bids
-          for (const key in winningUnitBids) {
-            const bid = winningUnitBids[key];
-            finalWinners.push({
-              bidder: bid.bidder,
-              bid: bid.bidAmount,
-              site: site,
-              unit: key
             });
+
+            // construct the desired output from the winning bids
+            for (const key in winningUnitBids) {
+              const bid = winningUnitBids[key];
+
+              finalWinners.push({
+                bidder: bid.bidder,
+                bid: bid.bidAmount,
+                site: site,
+                unit: key
+              });
+            }
+          } else {
+            throw new Error(`${site} is not an approved site.`);
           }
-        } else {
-          this.showError(`${site} is not an approved site.`);
-          return;
+
+          return finalWinners;
+        });
+
+        if (!!results) {
+          this.auctionResults = results[0];
+          this.auctionResultsRaw = JSON.stringify(results);
         }
-
-        return finalWinners;
-      });
-
-      this.auctionResultsRaw = JSON.stringify(results);
-
-      if (!!results) {
-        this.auctionResults = results[0];
+      } catch (e) {
+        this.showError(e.message);
       }
 
+      // fall through in either case and flip the flags
       this.showAuctionStartButton = false;
       this.showRestartButton = true;
     }
