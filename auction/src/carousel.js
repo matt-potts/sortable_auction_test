@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { observer } from "mobx-react"
-import { decorate } from 'mobx'
 import PropTypes from 'prop-types';
 import { Carousel } from 'react-bootstrap';
 
@@ -15,8 +14,6 @@ const AuctionCarousel = observer(class AuctionCarousel extends Component {
           unit: PropTypes.string
         })).isRequired
     };
-
-
 
     render() {
       return <>
@@ -36,10 +33,6 @@ const AuctionCarousel = observer(class AuctionCarousel extends Component {
         </Carousel>
       </>;
     }
-});
-
-decorate(AuctionCarousel, {
-
 });
 
 export default AuctionCarousel;
